@@ -21,7 +21,7 @@ const Header = () => {
   const logout = async () => {
     try {
       const { data } = await axios.get(
-        "https://todo-app-server-psjd.onrender.com/users/logout",
+        "https://todo-app-server-ledo.onrender.com/users/logout",
         { withCredentials: true }
       );
       toast.success(data.message);

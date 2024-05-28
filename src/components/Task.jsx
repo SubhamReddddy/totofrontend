@@ -21,7 +21,7 @@ const Task = () => {
     const load = async () => {
       try {
         const { data } = await axios.get(
-          "https://todo-app-server-psjd.onrender.com/tasks/mytasks",
+          "https://todo-app-server-ledo.onrender.com/tasks/mytasks",
           { withCredentials: true }
         );
         setDat([...data.tasks]);

@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const taskApi = createApi({
   reducerPath: "taskApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://todo-app-server-psjd.onrender.com/tasks/",
+    baseUrl: "https://todo-app-server-ledo.onrender.com/tasks/",
     credentials: "include",
   }),
   endpoints: (builder) => ({
