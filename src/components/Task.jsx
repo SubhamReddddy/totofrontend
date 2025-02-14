@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import {
   useCreateTaskMutation,
-  useGetAllTaskQuery,
   useUpdateTaskMutation,
 } from "../Redux/Api/TaskApi";
 import toast from "react-hot-toast";
@@ -21,7 +20,7 @@ const Task = () => {
     const load = async () => {
       try {
         const { data } = await axios.get(
-          "https://todo-app-server-ledo.onrender.com/tasks/mytasks",
+          `${import.meta.env.VITE_BACKEND_URL}/tasks/mytasks`,
           { withCredentials: true }
         );
         setDat([...data.tasks]);
@@ -34,9 +33,10 @@ const Task = () => {
 
   const deleteFun = async (id) => {
     try {
-      const { data } = await axios.delete(`http://localhost:4000/tasks/${id}`, {
-        withCredentials: true,
-      });
+      const { data } = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/tasks/${id}`,
+        { withCredentials: true }
+      );
       toast.success(data.message);
     } catch (error) {
       toast.error(error.response.data.message);
@@ -54,10 +54,8 @@ const Task = () => {
     setReload(!reload);
   };
 
-  // console.log(data.tasks)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
     const res = await createTask({ title, description });
     if (res.data) {
       toast.success(res.data.message);
@@ -67,85 +65,83 @@ const Task = () => {
     setReload(!reload);
     setTitle("");
     setDescription("");
-    // You can send this data to your backend or handle it according to your application's requirements
   };
 
   const user = useSelector((state) => state.userSlice.user);
   if (!user) return <Navigate to={"/signin/up"} />;
+
   return (
-    <div className="h-fit w-screen flex flex-col justify-center items-center bg-gray-100">
-      <div className="w-96 mx-auto p-10 bg-white">
-        <form className="mt-8" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-6">
-            <label className="block">
-              <span className="text-gray-700">Title</span>
-              <input
-                type="text"
-                className="mt-1 block w-full outline-none"
-                placeholder="Enter title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-gray-700">Description</span>
-              <textarea
-                className="mt-1 block w-full outline-none"
-                rows="4"
-                placeholder="Enter description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-              ></textarea>
-            </label>
-
-            <button
-              type="submit"
-              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Add Todo
-            </button>
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 p-6 mt-16">
+      {/* Task Form */}
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
+        <h2 className="text-2xl font-semibold text-center mb-4 text-gray-800">
+          Add a New Task
+        </h2>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label className="text-gray-700 font-medium">Title</label>
+            <input
+              type="text"
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 outline-none"
+              placeholder="Enter title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
           </div>
+
+          <div>
+            <label className="text-gray-700 font-medium">Description</label>
+            <textarea
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 outline-none"
+              rows="4"
+              placeholder="Enter description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 rounded-md shadow-md hover:bg-indigo-700 transition"
+          >
+            Add Task
+          </button>
         </form>
       </div>
 
-      <div className="flex flex-col gap-5 my-10 ">
-        {dat &&
-          dat.map((task) => (
-            <div key={task._id} className="w-fit grid grid-cols-4 gap-5">
+      {/* Task List */}
+      <div className="w-full max-w-2xl mt-8 space-y-4">
+        {dat.map((task) => (
+          <div
+            key={task._id}
+            className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md border-l-4 border-indigo-500"
+          >
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold text-gray-900">
+                {task.title}
+              </span>
+              <span className="text-sm text-gray-600">{task.description}</span>
+            </div>
+
+            <div className="flex items-center space-x-4">
               <input
-                type="text"
-                value={task.title}
-                readOnly
-                className="outline-none text-center"
+                type="checkbox"
+                checked={task.isCompleted}
+                className="w-6 h-6 cursor-pointer accent-indigo-600"
+                onChange={() => update(task._id)}
               />
-              <input
-                type="text"
-                value={task.description}
-                readOnly
-                className="outline-none text-center"
-              />
-              <div className="h-full w-full flex justify-center items-center">
-                <input
-                  type="checkbox"
-                  checked={task.isCompleted}
-                  className="cursor-pointer w-7 h-7"
-                  onChange={() => {
-                    update(task._id);
-                  }}
-                />
-              </div>
+
               <button
-                onClick={() => {
-                  deleteFun(task._id);
-                }}
+                onClick={() => deleteFun(task._id)}
+                className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
               >
                 Delete
               </button>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     </div>
   );
