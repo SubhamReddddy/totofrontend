@@ -1,1 +1,1 @@
-live dome : https://totofrontend.vercel.app/
+live demo : https://totofrontend.vercel.app/
